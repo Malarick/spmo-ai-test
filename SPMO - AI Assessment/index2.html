@@ -1,0 +1,479 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Literacy Assessment</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-gray-50">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const CheckCircle = (props) => (
+      <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9 12l2 2 4-4" />
+        <circle cx="12" cy="12" r="10" />
+      </svg>
+    );
+
+    const AlertCircle = (props) => (
+      <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="8" x2="12" y2="12" />
+        <line x1="12" y1="16" x2="12" y2="16" />
+      </svg>
+    );
+
+    const questions = [
+      // AI Capabilities & Limitations
+      { id: 1, category: "capabilities", question: "What is the primary limitation of current AI systems?", options: ["They cannot learn from data", "They lack true understanding and common sense reasoning", "They are too expensive to deploy", "They require constant internet connection"], correct: 1 },
+      { id: 2, category: "capabilities", question: "Which task is AI currently BEST at performing?", options: ["Making ethical decisions independently", "Pattern recognition in large datasets", "Understanding human emotions perfectly", "Creating original scientific theories"], correct: 1 },
+      { id: 3, category: "capabilities", question: "What role should humans play when using AI systems?", options: ["None - AI should work autonomously", "Only initial setup, then hands-off", "Ongoing oversight, validation, and decision-making", "Just fixing errors after they occur"], correct: 2 },
+      { id: 4, category: "capabilities", question: "Which statement about AI 'understanding' is most accurate?", options: ["AI truly understands content like humans do", "AI processes patterns without genuine comprehension", "AI has consciousness similar to humans", "AI understands emotions better than logic"], correct: 1 },
+      // Types of AI
+      { id: 5, category: "types", question: "What distinguishes Generative AI from other AI types?", options: ["It only analyzes existing data", "It creates new content based on patterns learned", "It can only work with numbers", "It requires no training data"], correct: 1 },
+      { id: 6, category: "types", question: "What is Predictive AI primarily used for?", options: ["Creating new images and text", "Forecasting outcomes based on historical data", "Having conversations with users", "Translating between languages"], correct: 1 },
+      { id: 7, category: "types", question: "In supervised learning, what does the AI require?", options: ["No human input at all", "Labeled training data with correct answers", "Only the questions, not the answers", "Connection to the internet"], correct: 1 },
+      { id: 8, category: "types", question: "What is unsupervised learning best used for?", options: ["Predicting specific labeled outcomes", "Finding hidden patterns in unlabeled data", "Generating text responses", "Following explicit rules"], correct: 1 },
+      // AI Risk Awareness
+      { id: 9, category: "risk", question: "What is an AI 'hallucination'?", options: ["When AI becomes self-aware", "When AI generates false or nonsensical information confidently", "When AI refuses to answer", "When AI takes too long to respond"], correct: 1 },
+      { id: 10, category: "risk", question: "What is algorithmic bias in AI?", options: ["AI running too slowly", "Unfair outcomes due to biased training data or design", "AI preferring certain file formats", "Technical errors in code"], correct: 1 },
+      { id: 11, category: "risk", question: "What is a key privacy risk when using AI tools?", options: ["AI systems are always completely secure", "Sensitive data shared with AI may be stored or used for training", "AI cannot process personal information", "Privacy is not a concern with cloud AI"], correct: 1 },
+      { id: 12, category: "risk", question: "Why is AI governance important in organizations?", options: ["It's just a bureaucratic requirement", "To ensure responsible, ethical, and compliant AI use", "To slow down AI adoption", "Only for legal liability reasons"], correct: 1 },
+      // AI-Compatible Data Structures
+      { id: 13, category: "data", question: "What type of data structure works best with most AI models?", options: ["Unstructured text documents only", "Structured, clean, labeled datasets", "Handwritten notes", "Audio recordings only"], correct: 1 },
+      { id: 14, category: "data", question: "What is a 'feature' in machine learning?", options: ["A fancy visualization", "An input variable used to make predictions", "The final output of the model", "The AI model's name"], correct: 1 },
+      { id: 15, category: "data", question: "What is a 'target' or 'label' in supervised learning?", options: ["The input data", "The outcome you want the AI to predict", "The name of the dataset", "The algorithm type"], correct: 1 },
+      { id: 16, category: "data", question: "Why is data cleaning critical for AI?", options: ["It makes data look pretty", "Poor quality data leads to poor AI performance", "It's only needed for legal compliance", "AI can automatically fix all data issues"], correct: 1 },
+      // AI Tools & Functionality
+      { id: 17, category: "tools", question: "What is prompt engineering?", options: ["Building AI models from scratch", "Crafting effective instructions to get desired AI outputs", "Coding in Python", "Designing databases"], correct: 1 },
+      { id: 18, category: "tools", question: "Which is an example of a no-code AI tool?", options: ["TensorFlow", "PyTorch", "ChatGPT web interface", "Jupyter Notebook"], correct: 2 },
+      { id: 19, category: "tools", question: "What does an AI API allow you to do?", options: ["Only train models locally", "Integrate AI capabilities into applications programmatically", "Replace all human workers", "Download AI models to your phone"], correct: 1 },
+      { id: 20, category: "tools", question: "What's a key benefit of using established AI tools vs building custom models?", options: ["Custom models are always better", "Faster deployment and lower cost for common tasks", "You have less control with established tools", "Custom models require no technical knowledge"], correct: 1 }
+    ];
+
+    const categoryNames = {
+      capabilities: "AI Capabilities & Limitations",
+      types: "Types of AI",
+      risk: "AI Risk Awareness",
+      data: "AI-Compatible Data Structures",
+      tools: "AI Tools & Functionality"
+    };
+
+    const App = () => {
+      const [mode, setMode] = useState('quiz');
+      const [formData, setFormData] = useState({ name: '', email: '', team: '' });
+      const [started, setStarted] = useState(false);
+      const [currentQuestion, setCurrentQuestion] = useState(0);
+      const [answers, setAnswers] = useState({});
+      const [submitted, setSubmitted] = useState(false);
+      const [results, setResults] = useState(null);
+      const [shuffledQuestions, setShuffledQuestions] = useState([]);
+      const [submitting, setSubmitting] = useState(false);
+
+      useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const modeParam = urlParams.get('mode');
+        if (modeParam === 'cheatsheet') {
+          setMode('cheatsheet');
+        }
+      }, []);
+
+      useEffect(() => {
+        if (started && shuffledQuestions.length === 0) {
+          const shuffled = [...questions].sort(() => Math.random() - 0.5);
+          setShuffledQuestions(shuffled);
+        }
+      }, [started, shuffledQuestions.length]);
+
+      const handleStart = () => {
+        if (formData.name && formData.email) {
+          setStarted(true);
+        }
+      };
+
+      const handleAnswer = (questionId, answerIndex) => {
+        setAnswers({ ...answers, [questionId]: answerIndex });
+      };
+
+      const calculateResults = () => {
+        const categoryScores = {
+          capabilities: 0,
+          types: 0,
+          risk: 0,
+          data: 0,
+          tools: 0
+        };
+
+        let totalScore = 0;
+
+        questions.forEach(q => {
+          if (answers[q.id] === q.correct) {
+            categoryScores[q.category]++;
+            totalScore++;
+          }
+        });
+
+        return { totalScore, categoryScores };
+      };
+
+      const getRecommendation = (category, score) => {
+        const recommendations = {
+          capabilities: {
+            low: "Focus on understanding what AI can and cannot do. Learn about the importance of human oversight and AI's limitations in reasoning and common sense.",
+            high: "Great understanding! Continue staying updated on AI capabilities as the field evolves rapidly."
+          },
+          types: {
+            low: "Review the differences between Generative AI, Predictive AI, supervised learning, and unsupervised learning. Understanding these distinctions is fundamental.",
+            high: "Excellent grasp of AI types! This knowledge will help you choose the right tools for different tasks."
+          },
+          risk: {
+            low: "Deepen your understanding of AI risks including hallucinations, bias, privacy concerns, and the need for governance. This is critical for responsible AI use.",
+            high: "Strong risk awareness! This mindset is essential for deploying AI responsibly in our organization."
+          },
+          data: {
+            low: "Strengthen your knowledge of data structures, cleaning, features, and targets. Quality data is the foundation of effective AI.",
+            high: "Solid understanding of data fundamentals! You're well-equipped to prepare data for AI applications."
+          },
+          tools: {
+            low: "Practice prompt engineering and explore both no-code tools and API-based solutions. Hands-on experience is the best teacher.",
+            high: "Great familiarity with AI tools! Keep experimenting with different approaches to expand your toolkit."
+          }
+        };
+
+        return score >= 3 ? recommendations[category].high : recommendations[category].low;
+      };
+
+      const getOverallInsight = (totalScore) => {
+        if (totalScore >= 18) {
+          return {
+            title: "Outstanding AI Expert!",
+            message: "You have exceptional knowledge of AI fundamentals! You're well-positioned to be an AI champion in your organization, helping others navigate AI adoption safely and effectively.",
+            color: "text-green-600"
+          };
+        } else if (totalScore >= 15) {
+          return {
+            title: "Strong AI Knowledge",
+            message: "You have a solid grasp of AI concepts! With a bit more focus on your weaker areas, you'll be fully equipped to leverage AI tools confidently and responsibly in your work.",
+            color: "text-blue-600"
+          };
+        } else if (totalScore >= 12) {
+          return {
+            title: "Good Foundation",
+            message: "You understand the basics of AI, but there's room to grow. Focus on the categories below where you scored lower - strengthening these areas will significantly boost your AI readiness.",
+            color: "text-indigo-600"
+          };
+        } else if (totalScore >= 9) {
+          return {
+            title: "Building Your AI Skills",
+            message: "You're on the right track, but need to develop your AI knowledge further. Don't worry - with focused learning in the areas highlighted below, you'll quickly build confidence working with AI tools.",
+            color: "text-orange-600"
+          };
+        } else {
+          return {
+            title: "Starting Your AI Journey",
+            message: "AI is new territory for you, and that's okay! This assessment shows you where to focus your learning. We recommend starting with structured AI training to build a strong foundation across all categories.",
+            color: "text-amber-600"
+          };
+        }
+      };
+
+      const handleSubmit = async () => {
+        const { totalScore, categoryScores } = calculateResults();
+        const resultData = {
+          totalScore,
+          categoryScores,
+          recommendations: {},
+          overallInsight: getOverallInsight(totalScore)
+        };
+
+        Object.keys(categoryScores).forEach(cat => {
+          resultData.recommendations[cat] = getRecommendation(cat, categoryScores[cat]);
+        });
+
+        setResults(resultData);
+        setSubmitted(true);
+
+        setSubmitting(true);
+        try {
+          const payload = {
+            name: formData.name,
+            email: formData.email,
+            team: formData.team,
+            totalScore: totalScore,
+            scores: categoryScores
+          };
+
+          const scriptUrl = 'https://script.google.com/macros/s/AKfycbwAhqBwEq68MNz5hKq2O6ubbqfz7LtEshsMDx3HwfzbEHtBbR4rNtpBoj3IkziAi4l1lA/exec';
+
+          await fetch(scriptUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+          });
+        } catch (error) {
+          console.error('Error submitting to Google Sheets:', error);
+        } finally {
+          setSubmitting(false);
+        }
+      };
+
+      if (mode === 'cheatsheet') {
+        return (
+          <div className="min-h-screen bg-gray-50 p-8">
+            <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-8">
+              <h1 className="text-3xl font-bold text-red-600 mb-2">Admin Cheat Sheet</h1>
+              <p className="text-gray-600 mb-8">Answer Key - Keep Confidential</p>
+
+              {Object.keys(categoryNames).map(cat => (
+                <div key={cat} className="mb-8">
+                  <h2 className="text-xl font-semibold text-blue-600 mb-4">{categoryNames[cat]}</h2>
+                  {questions.filter(q => q.category === cat).map(q => (
+                    <div key={q.id} className="mb-4 p-4 bg-gray-50 rounded border-l-4 border-blue-500">
+                      <p className="font-medium mb-2">Q{q.id}: {q.question}</p>
+                      <div className="ml-4 space-y-1">
+                        {q.options.map((opt, idx) => (
+                          <p key={idx} className={idx === q.correct ? "text-green-600 font-semibold" : "text-gray-500"}>
+                            {String.fromCharCode(65 + idx)}. {opt} {idx === q.correct && "CORRECT"}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+
+      if (submitted && results) {
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
+            <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-xl p-6 md:p-8">
+              <div className="text-center mb-8">
+                <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                <h1 className="text-3xl font-bold text-gray-800 mb-2">Assessment Complete!</h1>
+                <p className="text-gray-600">Thank you, {formData.name}</p>
+              </div>
+
+              <div className="bg-blue-50 rounded-lg p-6 mb-8 text-center">
+                <p className="text-gray-600 mb-2">Your Total Score</p>
+                <p className="text-5xl font-bold text-blue-600">{results.totalScore}/20</p>
+                <p className="text-gray-600 mt-2">{Math.round((results.totalScore/20)*100)}%</p>
+              </div>
+
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 mb-8 border-l-4 border-blue-500">
+                <h2 className={`text-2xl font-bold mb-3 ${results.overallInsight.color}`}>
+                  {results.overallInsight.title}
+                </h2>
+                <p className="text-gray-700 leading-relaxed">
+                  {results.overallInsight.message}
+                </p>
+              </div>
+
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">Category Breakdown</h2>
+
+              {Object.keys(results.categoryScores).map(cat => (
+                <div key={cat} className="mb-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-medium text-gray-700">{categoryNames[cat]}</span>
+                    <span className="text-gray-600">{results.categoryScores[cat]}/4</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+                    <div
+                      className="bg-blue-600 h-3 rounded-full transition-all duration-500"
+                      style={{ width: `${(results.categoryScores[cat]/4)*100}%` }}
+                    />
+                  </div>
+                  <p className="text-sm text-gray-600 italic">{results.recommendations[cat]}</p>
+                </div>
+              ))}
+
+              <div className="mt-8 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+                <p className="text-sm text-gray-700">
+                  <strong>Next Steps:</strong> Your results have been recorded. Your manager will receive a summary
+                  and personalized training recommendations based on your assessment.
+                </p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      if (!started) {
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+            <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">AI Literacy Assessment</h1>
+              <p className="text-gray-600 mb-6">Test your knowledge of AI fundamentals</p>
+
+              <div className="space-y-4 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter your name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter your email"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Team (Optional)</label>
+                  <input
+                    type="text"
+                    value={formData.team}
+                    onChange={(e) => setFormData({...formData, team: e.target.value})}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter your team"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-blue-50 rounded-lg p-4 mb-6">
+                <h3 className="font-semibold text-blue-900 mb-2">Assessment Details:</h3>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• 20 multiple-choice questions</li>
+                  <li>• 5 categories of AI knowledge</li>
+                  <li>• Takes approximately 10-15 minutes</li>
+                  <li>• Immediate results and recommendations</li>
+                </ul>
+              </div>
+
+              <button
+                onClick={handleStart}
+                disabled={!formData.name || !formData.email}
+                className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
+              >
+                Start Assessment
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      if (shuffledQuestions.length === 0) {
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading questions...</p>
+            </div>
+          </div>
+        );
+      }
+
+      const currentQ = shuffledQuestions[currentQuestion];
+      const progress = ((currentQuestion + 1) / 20) * 100;
+      const allAnswered = Object.keys(answers).length === 20;
+
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8">
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-white rounded-lg shadow-xl p-6 md:p-8">
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium text-gray-600">
+                    Question {currentQuestion + 1} of 20
+                  </span>
+                  <span className="text-sm text-gray-500">
+                    {categoryNames[currentQ.category]}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+
+              <h2 className="text-xl md:text-2xl font-semibold text-gray-800 mb-6">
+                {currentQ.question}
+              </h2>
+
+              <div className="space-y-3 mb-8">
+                {currentQ.options.map((option, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleAnswer(currentQ.id, idx)}
+                    className={`w-full text-left p-4 rounded-lg border-2 transition ${
+                      answers[currentQ.id] === idx
+                        ? 'border-blue-600 bg-blue-50'
+                        : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    <span className="font-medium text-gray-700">
+                      {String.fromCharCode(65 + idx)}.
+                    </span>{' '}
+                    <span className="text-gray-800">{option}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex justify-between">
+                <button
+                  onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
+                  disabled={currentQuestion === 0}
+                  className="px-6 py-2 border-2 border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+
+                {currentQuestion < 19 ? (
+                  <button
+                    onClick={() => setCurrentQuestion(currentQuestion + 1)}
+                    disabled={answers[currentQ.id] === undefined}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleSubmit}
+                    disabled={!allAnswered || submitting}
+                    className="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  >
+                    {submitting ? 'Submitting...' : 'Submit Assessment'}
+                  </button>
+                )}
+              </div>
+
+              {currentQuestion === 19 && !allAnswered && (
+                <p className="text-center text-sm text-amber-600 mt-4">
+                  <AlertCircle className="w-4 h-4 inline mr-1" />
+                  Please answer all questions before submitting
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
