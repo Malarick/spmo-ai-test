@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Literacy Assessment</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --accent-soft: #e3ecff;
+      --border: #e5e7eb;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --yellow: #f59e0b;
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #fff;
+      padding: 28px 20px;
+    }
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      letter-spacing: -0.02em;
+    }
+    header p { margin: 0; color: #cbd5e1; }
+    .page {
+      max-width: 960px;
+      margin: -32px auto 40px;
+      padding: 0 16px;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+      padding: 24px;
+      border: 1px solid var(--border);
+    }
+    .flex {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 6px;
+      color: var(--ink);
+    }
+    input[type="text"], input[type="email"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #f9fafb;
+      font-size: 14px;
+    }
+    input:focus {
+      outline: 2px solid var(--accent-soft);
+      border-color: var(--accent);
+    }
+    .question {
+      margin-bottom: 18px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fafbff;
+    }
+    .question h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+    }
+    .category-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .options label {
+      font-weight: 500;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      cursor: pointer;
+      padding: 8px 10px;
+      border-radius: 10px;
+    }
+    .options input {
+      margin-top: 3px;
+    }
+    .options label:hover {
+      background: #eef2ff;
+    }
+    button {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 15px;
+      width: 100%;
+      margin-top: 8px;
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.25);
+    }
+    button:hover { transform: translateY(-1px); }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: #eef2ff;
+      border-radius: 10px;
+      color: #1d4ed8;
+      font-weight: 600;
+      margin: 6px 0;
+    }
+    .result {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+    }
+    .bar {
+      width: 100%;
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar span {
+      display: block;
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+    .muted { color: var(--muted); font-size: 14px; }
+    .status {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #fff7ed;
+      color: #c2410c;
+      border: 1px solid #fed7aa;
+      font-size: 13px;
+    }
+    .cheat h3 { margin: 0; }
+    .cheat-item {
+      border-bottom: 1px solid var(--border);
+      padding: 12px 0;
+    }
+    .cheat-item:last-child { border-bottom: none; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+    @media (max-width: 640px) {
+      .page { margin-top: -24px; }
+      button { width: 100%; }
+    }
+    .secondary {
+      background: #e5e7eb;
+      color: #0f172a;
+      box-shadow: none;
+      border: 1px solid var(--border);
+      margin-top: 12px;
+    }
+    
+    .review-card {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      background: #f8fafc;
+    }
+    .answer-ok { color: #166534; font-weight: 700; }
+    .answer-bad { color: #b91c1c; font-weight: 700; }    /* Report mode (Google-inspired) */
+    .report-wrap { display: flex; flex-direction: column; gap: 16px; }
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .report-card {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .report-card h4 { margin: 0 0 4px; font-size: 14px; color: #5f6368; }
+    .report-value { font-size: 22px; font-weight: 700; color: #1a73e8; }
+    .report-sub { color: #5f6368; font-size: 13px; }
+    .table-wrap { overflow-x: auto; border: 1px solid #e0e0e0; border-radius: 12px; background: #fff; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+    th { background: #f8f9fa; color: #5f6368; font-weight: 600; font-size: 13px; }
+    .pill-tag { display: inline-block; padding: 4px 8px; border-radius: 999px; font-size: 12px; }
+    .pill-easy { background: #e6f4ea; color: #137333; }
+    .pill-med { background: #fef7e0; color: #c58a00; }
+    .pill-hard { background: #fce8e6; color: #c5221f; }
+    .bar-row { background: #f5f5f5; height: 8px; border-radius: 999px; overflow: hidden; }
+    .bar-fill { height: 100%; background: #1a73e8; }
+    .report-section-title { margin: 8px 0; font-size: 16px; font-weight: 700; color: #202124; }</style>
+</head>
+<body>
+  <header>
+    <h1>AI Literacy Assessment</h1>
+    <p id="modeLabel">20 questions - 5 categories - instant feedback</p>
+  </header>
+  <main class="page">
+    <section class="card" id="quizSection" aria-live="polite">
+      <div id="intro">
+        <div class="pill">Mode: <span id="modeValue">Quiz</span></div>
+        <p class="muted">Enter your details, answer all 20 questions, then submit to see your score and recommendations. Your answers are private and only your score is recorded.</p>
+      </div>
+
+      <form id="quizForm">
+        <div class="flex">
+          <div style="flex:1; min-width:220px;">
+            <label for="name">Name *</label>
+            <input required id="name" name="name" type="text" placeholder="Alex Johnson" />
+          </div>
+          <div style="flex:1; min-width:220px;">
+            <label for="email">Email *</label>
+            <input required id="email" name="email" type="email" placeholder="alex@example.com" />
+          </div>
+          <div style="flex:1; min-width:180px;">
+            <label for="team">Team (optional)</label>
+            <input id="team" name="team" type="text" placeholder="Product, Ops, Finance..." />
+          </div>
+        </div>
+
+        <div id="questions"></div>
+        <button type="submit">Submit Assessment</button>
+      </form>
+
+      <div id="results" class="result" style="display:none;"></div>
+      <div id="status" class="status" style="display:none;"></div>
+    </section>
+
+    <section class="card cheat" id="cheatSection" style="display:none;">
+      <div class="pill">Mode: <span>Cheat Sheet</span></div>
+      <p class="muted">Admin-only view. Share only with trusted viewers. Switch back to <a href="?mode=quiz">quiz mode</a>.</p>
+      <div id="cheatList"></div>
+    </section>
+      <section class="card" id="reportSection" style="display:none;">
+      <div class="pill" style="background:#e8f0fe;color:#1a73e8;">Mode: <span>Report</span></div>
+      <p class="muted">Admin-only dashboard. Use ?mode=report to access. Data pulled from Google Sheets (JSONP).</p>
+      <div id="reportContent"></div>
+    </section>
+  </main>
+
+  <script>
+    const ENDPOINT = "https://script.google.com/macros/s/AKfycbwSBjDL3ySzATAUKo9-k9UxjdRc1Lc-hfL_03ukvbbgEcP_9tkywiyfSuZ9k-ZtMvvFYg/exec";
+
+    const categories = {
+      capabilities: { label: "AI Capabilities & Limitations" },
+      types: { label: "Types of AI" },
+      risk: { label: "AI Risk Awareness" },
+      data: { label: "AI-Compatible Data Structures" },
+      tools: { label: "AI Tools & Functionality" }
+    };
+
+    // Lightweight "dynamic" recommendations: rotate phrasing so advice feels fresh.
+    const recPool = {
+      capabilities: [
+        "Tighten your sense of where AI helps vs. where deterministic logic is safer. Pair AI drafts with human review for high-stakes outputs.",
+        "Sharpen judgment on AI limits. Use AI for ideation and summaries, and keep critical calculations and approvals deterministic.",
+        "Build checklists so AI suggestions are reviewed before action. Treat AI as assistive, not autonomous, for compliance-heavy tasks."
+      ],
+      types: [
+        "Match problems to the right model family: supervised for labeled outcomes, unsupervised to explore structure, generative for creation.",
+        "Clarify when to use predictive vs. generative approaches. Keep a menu of patterns (classification, regression, RAG, generation).",
+        "Choose tooling intentionally: RAG for grounded answers, classification for routing, generation for drafting."
+      ],
+      risk: [
+        "Guard against hallucinations with retrieval, source citations, and human checkpoints. Keep sensitive data out of public LLMs.",
+        "Add safety rails: approvals for regulated content, logging for audits, and bias monitoring on key decisions.",
+        "Shrink risk by constraining prompts, using vetted corpora, and enforcing human-in-the-loop for external-facing outputs."
+      ],
+      data: [
+        "Improve data hygiene: clear targets, tidy rows, handled nulls, and metadata for retrieval. Avoid leakage between train/test.",
+        "Invest in structured inputs: consistent schemas, validated fields, and chunked documents with metadata for Q&A.",
+        "Make datasets model-ready: engineered features, explicit labels, and clean splits for evaluation."
+      ],
+      tools: [
+        "Use structured prompts with role, constraints, and examples. Combine no-code tools for speed with APIs for control.",
+        "Practice function calling and RAG to make outputs reliable. Keep prompt templates versioned and reusable.",
+        "Iterate prompts with examples and tests. Use the right tool: chat UI for exploration, APIs for repeatable flows."
+      ]
+    };
+
+    const questions = [
+      { id: 1, category: "capabilities", question: "Which task is a generative AI model least reliable for without human oversight?", options: ["Brainstorming marketing taglines", "Summarizing a meeting transcript", "Generating legally binding contract updates automatically", "Drafting first-pass code for review"], answer: 2 },
+      { id: 2, category: "capabilities", question: "What is an AI hallucination?", options: ["A model timing out because the context window is exceeded", "A model making up information and presenting it confidently", "A model refusing to answer for safety reasons", "A model returning results too slowly"], answer: 1 },
+      { id: 3, category: "capabilities", question: "Which statement about most production AI systems is most accurate?", options: ["They are generally capable of human-level reasoning across any domain", "They are narrow systems optimized for specific tasks and data", "They can understand new domains with no additional data", "They never require human oversight once deployed"], answer: 1 },
+      { id: 4, category: "capabilities", question: "Which scenario should still rely on a deterministic system instead of generative AI?", options: ["Generating design variations for a campaign", "Calculating payroll taxes and compliance-critical totals", "Drafting a FAQ page from existing docs", "Summarizing a user interview"], answer: 1 },
+
+      { id: 5, category: "types", question: "Forecasting next month's company sales revenue based on historical data is primarily an example of:", options: ["Generative AI", "Supervised learning (regression/classification)", "Unsupervised learning", "Rule-based automation"], answer: 1 },
+      { id: 6, category: "types", question: "Automatically translating English text into Indonesian is usually done with:", options: ["Rule-based automation", "Generative AI", "Unsupervised clustering", "Reinforcement learning"], answer: 1 },
+      { id: 7, category: "types", question: "A chatbot that searches your company documents first, then writes an answer is:", options: ["Rule-based automation", "Retrieval-augmented generation (RAG)", "Unsupervised clustering", "Reinforcement learning"], answer: 1 },
+      { id: 8, category: "types", question: "Grouping customers by similar behavior without labels is:", options: ["Supervised learning", "Reinforcement learning", "Unsupervised clustering", "Generative AI"], answer: 2 },
+
+      { id: 9, category: "risk", question: "What is the main risk of pasting confidential data into a public SaaS LLM?", options: ["The model will refuse to answer", "The data may be stored or used for training, leaking sensitive information", "The prompt will be throttled for rate limits", "The latency will increase"], answer: 1 },
+      { id: 10, category: "risk", question: "How can you reduce hallucinations when answering customer questions?", options: ["Turn off safety filters", "Use retrieval from approved documents and cite sources", "Increase temperature to promote creativity", "Shorten the prompt to a single sentence"], answer: 1 },
+      { id: 11, category: "risk", question: "Which is an example of AI bias risk?", options: ["Model accuracy improves with more data", "Predictions systematically under-approve loans for a specific demographic because of historical data", "A model rejects harmful prompts", "A model uses embeddings for similarity"], answer: 1 },
+      { id: 12, category: "risk", question: "Best practice for AI-generated outputs in compliance-critical content is to:", options: ["Allow automatic publishing to save time", "Skip human review if confidence is high", "Require human approval and maintain an audit trail", "Rely only on prompt engineering"], answer: 2 },
+
+      { id: 13, category: "data", question: "Why should you avoid putting units inside number cells (e.g., '10 USD')?", options: ["It turns numbers into text and breaks calculations", "It makes the data more accurate", "AI models require units inside the same cell", "It reduces file size"], answer: 0 },
+      { id: 14, category: "data", question: "Why are merged cells a problem for AI datasets in Excel/Google Sheets?", options: ["They make the file smaller", "They break consistent rows/columns for reading data", "They improve model accuracy", "They help automatic labeling"], answer: 1 },
+      { id: 15, category: "data", question: "For AI training, missing values should be handled by:", options: ["Leaving blanks consistently or using a clear placeholder like 'NA'", "Filling with random numbers", "Hiding rows with filters only", "Writing explanations inside the same cell (e.g., 'missing because…')"], answer: 0 },
+      { id: 16, category: "data", question: "What is the best way to store dates for AI in a spreadsheet?", options: ["Write dates in many different styles (e.g., '12/1', 'Dec 1', '01-12')", "Put date and time and notes in one cell", "Use merged cells for each month", "Use a real date format (one date per cell)"], answer: 3 },
+
+      { id: 17, category: "tools", question: "If your main goal is writing, summarizing, and reasoning with text, which tools are the best fit?", options: ["ChatGPT and Claude", "Canva AI and n8n", "Excel and PowerPoint", "Google Drive and Google Calendar"], answer: 0 },
+      { id: 18, category: "tools", question: "You want to create a workflow that cleans new rows, then writes results back to the same sheet. Which tool fits best?", options: ["n8n", "Canva AI", "Claude", "PowerPoint templates"], answer: 0 },
+      { id: 19, category: "tools", question: "You want to make social media graphics quickly and resize them for different platforms. Which tool fits best?", options: ["Canva AI", "ChatGPT", "n8n", "SQL"], answer: 0 },
+      { id: 20, category: "tools", question: "You want a tool that connects to many data sources (Sheets, BigQuery, SQL) and updates charts automatically. Which tool fits best?", options: ["Looker Studio", "n8n", "Claude", "Excel formulas"], answer: 0 },
+    ];
+
+
+    function getMode() {
+      const mode = new URLSearchParams(window.location.search).get("mode");
+      if (mode === "cheatsheet") return "cheatsheet";
+      if (mode === "report") return "report";
+      return "quiz";
+    }
+
+    function renderQuestions(list) {
+      const container = document.getElementById("questions");
+      container.innerHTML = "";
+      list.forEach((q, idx) => {
+        const questionEl = document.createElement("div");
+        questionEl.className = "question";
+        const opts = q.options
+          .map((opt, i) => {
+            const inputId = `q-${q.id}-${i}`;
+            return `
+              <label>
+                <input type="radio" name="q-${q.id}" value="${i}" id="${inputId}" required />
+                <span>${opt}</span>
+              </label>
+            `;
+          })
+          .join("");
+        questionEl.innerHTML = `
+          <div class="category-tag">${categories[q.category].label}</div>
+          <h3>${idx + 1}. ${q.question}</h3>
+          <div class="options">${opts}</div>
+        `;
+        container.appendChild(questionEl);
+      });
+    }
+
+    function buildPersonalizedNotes(categoryScores) {
+      const notes = {};
+      Object.keys(categoryScores).forEach((key) => {
+        const score = categoryScores[key];
+        const pool = recPool[key] || [];
+        if (!pool.length) return;
+        const variant = pool[Math.floor(Math.random() * pool.length)];
+        const tone = score >= 3 ? "Keep momentum" : score === 2 ? "Level up" : "Prioritize";
+        notes[key] = `${tone}: ${variant}`;
+      });
+      return notes;
+    }
+
+                function renderResults(totalScore, categoryScores, identity, responses) {
+      const results = document.getElementById("results");
+      const notes = buildPersonalizedNotes(categoryScores);
+      const summary = `
+        <h3>Hi ${identity.name || "there"}, here's your result</h3>
+        <p class="pill">Total score: <strong>${totalScore} / 20</strong></p>
+      `;
+
+      const breakdown = Object.keys(categories)
+        .map((key) => {
+          const score = categoryScores[key];
+          const percent = Math.round((score / 4) * 100);
+          return `
+            <div style="margin-bottom:16px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <strong>${categories[key].label}</strong>
+                <span>${score} / 4</span>
+              </div>
+              <div class="bar" aria-label="${categories[key].label} score ${score} of 4">
+                <span style="width:${percent}%"></span>
+              </div>
+              <div class="status" style="background:#f8fafc;border-color:#e5e7eb;color:#0f172a;margin-top:8px;">
+                ${notes[key] || "Keep practicing and revisit this area with examples and prompts."}
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+
+      const review = responses
+        .map((r, idx) => {
+          const yourIcon = r.isCorrect ? '&#10003;' : '&#10005;';
+          return `
+          <div class="review-card">
+            <div><strong>${idx + 1}. ${r.question}</strong></div>
+            <div>Your answer: <span class="${r.isCorrect ? 'answer-ok' : 'answer-bad'}">${yourIcon} ${r.chosen}</span></div>
+            <div>Correct answer: <span class="answer-ok">&#10003; ${r.correct}</span></div>
+          </div>
+        `;
+        })
+        .join("");
+
+      const retakeButton = `<button type="button" id="retakeBtn" class="secondary">Retake assessment</button>`;
+
+      results.innerHTML = summary + breakdown + `<h4>Review</h4>` + review + retakeButton;
+      results.style.display = "block";
+      results.scrollIntoView({ behavior: "smooth" });
+    }
+
+    function renderCheatSheet() {
+      const list = document.getElementById("cheatList");
+      const sorted = [...questions].sort((a, b) => a.category.localeCompare(b.category));
+      list.innerHTML = sorted
+        .map((q, idx) => {
+          return `
+            <div class="cheat-item">
+              <div class="badge">${categories[q.category].label}</div>
+              <h3>${idx + 1}. ${q.question}</h3>
+              <p><strong>Answer:</strong> ${q.options[q.answer]}</p>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    const PASSING_PERCENTAGE = 70;
+
+    function jsonpFetch(url) {
+      return new Promise((resolve, reject) => {
+        const cb = `cb_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+        const script = document.createElement("script");
+        const sep = url.includes("?") ? "&" : "?";
+        script.src = `${url}${sep}callback=${cb}`;
+        const timer = setTimeout(() => {
+          cleanup();
+          reject(new Error("Report fetch timed out"));
+        }, 10000);
+        function cleanup() {
+          clearTimeout(timer);
+          delete window[cb];
+          if (script.parentNode) script.parentNode.removeChild(script);
+        }
+        window[cb] = (data) => { cleanup(); resolve(data); };
+        script.onerror = () => { cleanup(); reject(new Error("Report fetch failed")); };
+        document.body.appendChild(script);
+      });
+    }
+
+    function computeReportMetrics(results) {
+      const maxScore = 20;
+      const withPercent = results.map((r) => {
+        const pct = maxScore ? (Number(r.totalScore || 0) / maxScore) * 100 : 0;
+        return { ...r, percentage: pct };
+      });
+      const total = withPercent.length;
+      let top = null;
+      let bottom = null;
+      let sumPct = 0;
+      withPercent.forEach((r) => {
+        sumPct += r.percentage;
+        if (!top || r.totalScore > top.totalScore) top = r;
+        if (!bottom || r.totalScore < bottom.totalScore) bottom = r;
+      });
+      const avgPct = total ? sumPct / total : 0;
+      const passCount = withPercent.filter((r) => r.percentage >= PASSING_PERCENTAGE).length;
+
+      const categoryAverages = {};
+      Object.keys(categories).forEach((key) => {
+        const totalCat = withPercent.reduce((acc, r) => acc + (r.scores?.[key] || 0), 0);
+        categoryAverages[key] = total ? (totalCat / (total * 4)) * 100 : 0;
+      });
+
+      const answerMap = new Map(questions.map((q) => [q.id, q.answer]));
+      const questionStats = questions.map((q) => ({
+        id: q.id,
+        question: q.question,
+        correctAnswer: q.options[q.answer],
+        attempts: 0,
+        correct: 0
+      }));
+
+      withPercent.forEach((r) => {
+        (r.responses || []).forEach((ans) => {
+          const qs = questionStats.find((q) => q.id === ans.questionId);
+          if (!qs) return;
+          qs.attempts += 1;
+          const correctIdx = answerMap.get(ans.questionId);
+          if (Number(ans.choice) === correctIdx) qs.correct += 1;
+        });
+      });
+
+      questionStats.forEach((q) => {
+        q.success = q.attempts ? Math.round((q.correct / q.attempts) * 100) : 0;
+        q.difficulty = q.success > 80 ? "Easy" : q.success >= 50 ? "Medium" : "Hard";
+      });
+
+      const strongest = Object.entries(categoryAverages).sort((a, b) => b[1] - a[1])[0];
+      const weakest = Object.entries(categoryAverages).sort((a, b) => a[1] - b[1])[0];
+
+      return {
+        total,
+        avgPct,
+        passCount,
+        passRate: total ? (passCount / total) * 100 : 0,
+        top,
+        bottom,
+        categoryAverages,
+        questionStats,
+        strongest,
+        weakest
+      };
+    }
+
+        function renderReportView(metrics) {
+      const root = document.getElementById("reportContent");
+      if (!metrics) {
+        root.innerHTML = '<p class="status">No data available yet.</p>';
+        return;
+      }
+      const { total, avgPct, passCount, passRate, top, bottom, categoryAverages, questionStats, strongest, weakest } = metrics;
+      const summary = `
+        <div class="report-grid">
+          <div class="report-card"><h4>Total participants</h4><div class="report-value">${total}</div></div>
+          <div class="report-card"><h4>Average score</h4><div class="report-value">${avgPct.toFixed(1)}%</div></div>
+          <div class="report-card"><h4>Pass rate</h4><div class="report-value">${passRate.toFixed(1)}%</div><div class="report-sub">${passCount} of ${total} passed (>= ${PASSING_PERCENTAGE}%)</div></div>
+          <div class="report-card"><h4>Top performer</h4><div class="report-value">${top ? top.name || "(Unnamed)" : "-"}</div><div class="report-sub">${top ? `${top.totalScore}/20` : ""}</div></div>
+        </div>
+      `;
+
+      const questionRows = questionStats.map((q) => {
+        const pillClass = q.difficulty === "Easy" ? "pill-easy" : q.difficulty === "Medium" ? "pill-med" : "pill-hard";
+        const questionData = questions.find(question => question.id === q.id);
+        const optionsList = questionData ? questionData.options.map((opt, idx) => {
+          const isCorrect = idx === questionData.answer;
+          const indicator = isCorrect ? '<span class="answer-ok">✓</span>' : '<span style="color:#9ca3af;">○</span>';
+          return `<div style="padding:4px 0;">${indicator} ${opt}</div>`;
+        }).join('') : '';
+
+        return `
+          <tr>
+            <td style="vertical-align:top;">${q.id}</td>
+            <td style="vertical-align:top;">
+              <strong>${q.question}</strong>
+              <div style="margin-top:8px;padding:8px;background:#f9fafb;border-radius:8px;font-size:13px;">
+                ${optionsList}
+              </div>
+            </td>
+            <td style="vertical-align:top;">${q.correct}/${q.attempts || 0}</td>
+            <td style="vertical-align:top;">${q.success}%</td>
+            <td style="vertical-align:top;"><span class="pill-tag ${pillClass}">${q.difficulty}</span></td>
+          </tr>
+        `;
+      }).join("");
+
+      const categoryBars = Object.keys(categories).map((key) => {
+        const pct = Math.round(categoryAverages[key] || 0);
+        return `
+          <div style="margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <strong>${categories[key].label}</strong>
+              <span>${pct}%</span>
+            </div>
+            <div class="bar-row"><div class="bar-fill" style="width:${pct}%;"></div></div>
+          </div>
+        `;
+      }).join("");
+
+      const strengths = strongest && weakest ? `<p class="muted">Strongest: ${categories[strongest[0]].label} (${strongest[1].toFixed(1)}%). Weakest: ${categories[weakest[0]].label} (${weakest[1].toFixed(1)}%).</p>` : "";
+      const topBottom = `
+        <div class="report-grid">
+          <div class="report-card">
+            <h4>Top performer</h4>
+            <div class="report-value">${top ? top.name || "(Unnamed)" : "-"}</div>
+            <div class="report-sub">${top ? `${top.totalScore}/20 (${top.percentage.toFixed(1)}%)` : ""}</div>
+          </div>
+          <div class="report-card">
+            <h4>Bottom performer</h4>
+            <div class="report-value">${bottom ? bottom.name || "(Unnamed)" : "-"}</div>
+            <div class="report-sub">${bottom ? `${bottom.totalScore}/20 (${bottom.percentage.toFixed(1)}%)` : ""}</div>
+          </div>
+        </div>
+      `;
+
+      root.innerHTML = `
+        <div class="report-wrap">
+          ${summary}
+          <div>
+            <div class="report-section-title">Question performance</div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th>#</th><th>Question & Options</th><th>Correct/Attempts</th><th>Success %</th><th>Difficulty</th></tr>
+                </thead>
+                <tbody>${questionRows}</tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+            <div class="report-section-title">Per-category average</div>
+            ${categoryBars}
+            ${strengths}
+          </div>
+          <div>
+            <div class="report-section-title">Details</div>
+            ${topBottom}
+          </div>
+        </div>
+      `;
+    }
+
+    async function sendToSheet(payload) {
+      const status = document.getElementById("status");
+      if (!ENDPOINT || ENDPOINT.includes("REPLACE_WITH_DEPLOYED_URL")) {
+        status.style.display = "block";
+        status.textContent = "Result calculated locally. Set ENDPOINT to your deployed Google Apps Script URL to log responses.";
+        return;
+      }
+      status.style.display = "block";
+      status.textContent = "Saving your result securely...";
+      try {
+        await fetch(ENDPOINT, {
+          method: "POST",
+          mode: "no-cors", // avoids browser CORS enforcement; response is opaque
+          body: JSON.stringify(payload)
+        });
+        status.textContent = "Saved to Google Sheets (best effort)";
+        status.style.background = "#ecfdf3";
+        status.style.borderColor = "#bbf7d0";
+        status.style.color = "#166534";
+      } catch (err) {
+        status.textContent = "Could not save to Google Sheets. Your score is still shown locally.";
+      }
+    }
+
+    function init() {
+      const mode = getMode();
+      const quizSection = document.getElementById("quizSection");
+      const cheatSection = document.getElementById("cheatSection");
+      const reportSection = document.getElementById("reportSection");
+      const modeValue = document.getElementById("modeValue");
+      const modeLabel = document.getElementById("modeLabel");
+
+      if (mode === "cheatsheet") {
+        quizSection.style.display = "none";
+        cheatSection.style.display = "block";
+        reportSection.style.display = "none";
+        modeValue.textContent = "Cheat Sheet";
+        modeLabel.textContent = "Admin-only answer key";
+        renderCheatSheet();
+        return;
+      }
+
+      if (mode === "report") {
+        quizSection.style.display = "none";
+        cheatSection.style.display = "none";
+        reportSection.style.display = "block";
+        modeValue.textContent = "Report";
+        modeLabel.textContent = "Admin dashboard";
+        const reportContent = document.getElementById("reportContent");
+        reportContent.innerHTML = "<p class=\"muted\">Loading report...</p>";
+        jsonpFetch(`${ENDPOINT}?action=report`).then((res) => {
+          if (res && res.status === "ok") {
+            const metrics = computeReportMetrics(res.results || []);
+            renderReportView(metrics);
+          } else {
+            reportContent.innerHTML = "<p class='status'>Could not load report data.</p>";
+          }
+        }).catch(() => {
+          reportContent.innerHTML = "<p class='status'>Could not load report data.</p>";
+        });
+        return;
+      }
+
+      modeValue.textContent = "Quiz";
+      modeLabel.textContent = "20 questions - fixed order";
+
+      const quizForm = document.getElementById("quizForm");
+      const results = document.getElementById("results");
+      const status = document.getElementById("status");
+
+      let currentQuestions = questions;
+      let cachedIdentity = { name: "", email: "", team: "" };
+      renderQuestions(currentQuestions);
+
+      function resetQuiz() {
+        status.style.display = "none";
+        status.textContent = "";
+        results.style.display = "none";
+        results.innerHTML = "";
+        quizForm.style.display = "block";
+        currentQuestions = questions;
+        renderQuestions(currentQuestions);
+        // Keep identity fields populated
+        quizForm.name.value = cachedIdentity.name;
+        quizForm.email.value = cachedIdentity.email;
+        quizForm.team.value = cachedIdentity.team;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      quizForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const name = form.name.value.trim();
+        const email = form.email.value.trim();
+        const team = form.team.value.trim();
+
+        if (!name || !email) {
+          alert("Please enter your name and email.");
+          return;
+        }
+
+        const categoryScores = { capabilities: 0, types: 0, risk: 0, data: 0, tools: 0 };
+        let totalScore = 0;
+        let unanswered = [];
+        const responses = [];
+        const payloadResponses = [];
+
+        currentQuestions.forEach((q) => {
+          const selected = form.querySelector(`input[name="q-${q.id}"]:checked`);
+          if (!selected) {
+            unanswered.push(q.id);
+            return;
+          }
+          const choice = Number(selected.value);
+          const isCorrect = choice === q.answer;
+          if (isCorrect) {
+            totalScore += 1;
+            categoryScores[q.category] += 1;
+          }
+          responses.push({
+            question: q.question,
+            correct: q.options[q.answer],
+            chosen: q.options[choice],
+            isCorrect,
+            category: categories[q.category].label
+          });
+          payloadResponses.push({ questionId: q.id, choice });
+        });
+
+        if (unanswered.length) {
+          alert("Please answer all questions before submitting.");
+          return;
+        }
+
+        const payload = {
+          name,
+          email,
+          team,
+          totalScore,
+          scores: {
+            capabilities: categoryScores.capabilities,
+            types: categoryScores.types,
+            risk: categoryScores.risk,
+            data: categoryScores.data,
+            tools: categoryScores.tools
+          },
+          responses: payloadResponses
+        };
+
+        cachedIdentity = { name, email, team };
+        renderResults(totalScore, categoryScores, { name }, responses);
+        quizForm.style.display = "none"; // show only results after submit
+        sendToSheet(payload);
+
+        // Attach retake handler
+        const retakeBtn = document.getElementById("retakeBtn");
+        if (retakeBtn) {
+          retakeBtn.addEventListener("click", resetQuiz);
+        }
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
